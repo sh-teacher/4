@@ -1,5 +1,568 @@
-<html>
-<head><title>AISW교실 3기</title>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>부위별 스트레칭 가이드</title>
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --card-bg: #ffffff;
+    --text: #1c2230;
+    --text-dim: #5b6472;
+    --accent: #2f7d5f;
+    --accent-soft: #e4f3ec;
+    --border: #e3e7ec;
+    --danger: #b5502f;
+    --danger-soft: #fbeee6;
+    --shadow: 0 1px 3px rgba(20, 30, 40, 0.08), 0 1px 2px rgba(20, 30, 40, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14181d;
+      --card-bg: #1d232b;
+      --text: #eef1f4;
+      --text-dim: #98a3ae;
+      --accent: #59c290;
+      --accent-soft: #1d3229;
+      --border: #2a3138;
+      --danger: #e08a63;
+      --danger-soft: #33221b;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    padding: 28px 20px 18px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0 0 6px;
+    font-size: 1.5rem;
+  }
+  header p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 16px 60px;
+  }
+  .part-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .part-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 0.85rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+  }
+  .part-btn:hover { transform: translateY(-2px); }
+  .part-btn .emoji { font-size: 1.6rem; }
+  .part-btn.active {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  #result-section { display: none; }
+  #result-section.visible { display: block; }
+  .result-title {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .result-title .emoji { font-size: 1.4rem; }
+  .result-title h2 { margin: 0; font-size: 1.25rem; }
+  .result-desc {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin: 0 0 18px;
+  }
+  .stretch-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .stretch-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .stretch-head h3 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .badge {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .steps {
+    margin: 0 0 10px;
+    padding-left: 20px;
+    font-size: 0.92rem;
+  }
+  .steps li { margin-bottom: 4px; }
+  .caution {
+    background: var(--danger-soft);
+    color: var(--danger);
+    font-size: 0.82rem;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  .timer-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .timer-btn {
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .timer-btn:disabled { opacity: 0.6; cursor: default; }
+  .timer-display {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    min-width: 70px;
+  }
+  .empty-hint {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    padding: 40px 20px;
+  }
+  footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    padding: 10px 20px 30px;
+  }
+</style>
 </head>
-<body>바이브코딩 해보기123</body>
+<body>
+
+<header>
+  <h1>🧘 부위별 스트레칭 가이드</h1>
+  <p>아픈 부위를 선택하면 도움이 되는 스트레칭 방법을 알려드려요</p>
+</header>
+
+<main>
+  <div class="part-grid" id="part-grid"></div>
+
+  <section id="result-section">
+    <div class="result-title">
+      <span class="emoji" id="result-emoji"></span>
+      <h2 id="result-name"></h2>
+    </div>
+    <p class="result-desc" id="result-desc"></p>
+    <div id="stretch-list"></div>
+  </section>
+
+  <div class="empty-hint" id="empty-hint">위에서 아픈 부위를 눌러보세요</div>
+</main>
+
+<footer>본 정보는 일반적인 스트레칭 안내이며, 통증이 심하거나 지속되면 전문의와 상담하세요.</footer>
+
+<script>
+const DATA = {
+  neck: {
+    label: "목", emoji: "🙆",
+    desc: "장시간 앉아있거나 스마트폰을 오래 볼 때 뻣뻣해지는 목 근육을 풀어줍니다.",
+    stretches: [
+      {
+        name: "목 옆으로 기울이기",
+        badge: "좌우 각 20초 × 2회",
+        seconds: 20,
+        steps: [
+          "허리를 곧게 펴고 편안하게 앉거나 선다.",
+          "오른손을 머리 위로 올려 왼쪽 귀 방향으로 살짝 당긴다.",
+          "왼쪽 어깨는 아래로 내려 힘을 뺀 상태를 유지한다.",
+          "목 옆쪽이 당기는 느낌이 들면 20초간 유지 후 반대쪽도 실시한다."
+        ],
+        caution: "목을 억지로 세게 당기지 말고, 통증이 아닌 시원한 느낌 정도까지만 당기세요."
+      },
+      {
+        name: "턱 당기기 (거북목 교정)",
+        badge: "10초 × 5회",
+        seconds: 10,
+        steps: [
+          "정면을 바라본 상태로 어깨는 편다.",
+          "턱을 뒤로 살짝 당겨 이중턱을 만든다는 느낌으로 밀어 넣는다.",
+          "10초간 유지 후 힘을 뺀다.",
+          "5회 반복한다."
+        ],
+        caution: "목을 숙이거나 젖히지 않고 수평으로만 당기세요."
+      },
+      {
+        name: "목 돌리기 스트레칭",
+        badge: "좌우 각 5회",
+        seconds: 15,
+        steps: [
+          "고개를 천천히 오른쪽 어깨 쪽으로 숙였다가 정면으로, 다시 왼쪽으로 부드럽게 돌린다.",
+          "뒤로 완전히 젖히지 않고 원을 그리듯 반원만 그린다.",
+          "천천히 5회 반복한다."
+        ],
+        caution: "고개를 뒤로 완전히 젖히는 360도 회전은 목 디스크에 무리를 줄 수 있어 피하세요."
+      }
+    ]
+  },
+  shoulder: {
+    label: "어깨", emoji: "💪",
+    desc: "어깨 결림과 뭉침을 풀어주고 가동 범위를 넓혀줍니다.",
+    stretches: [
+      {
+        name: "팔 교차 스트레칭",
+        badge: "좌우 각 20초",
+        seconds: 20,
+        steps: [
+          "오른팔을 가슴 앞으로 곧게 뻗어 몸을 가로지르게 한다.",
+          "왼팔로 오른팔 팔꿈치를 감싸 몸 쪽으로 당긴다.",
+          "어깨 뒤쪽이 늘어나는 느낌을 유지하며 20초간 버틴다.",
+          "반대쪽도 동일하게 실시한다."
+        ],
+        caution: "어깨를 으쓱 올리지 말고 아래로 내린 상태를 유지하세요."
+      },
+      {
+        name: "어깨 으쓱-내리기",
+        badge: "10회",
+        seconds: 5,
+        steps: [
+          "양쪽 어깨를 귀 쪽으로 최대한 끌어올린다.",
+          "3초간 유지 후 힘을 빼고 아래로 툭 떨어뜨린다.",
+          "10회 반복한다."
+        ],
+        caution: "동작 중 숨을 참지 말고 자연스럽게 호흡하세요."
+      },
+      {
+        name: "등 뒤 깍지 끼기",
+        badge: "20초 × 2회",
+        seconds: 20,
+        steps: [
+          "양손을 등 뒤로 돌려 깍지를 낀다.",
+          "가슴을 펴면서 손을 살짝 위로 들어올린다.",
+          "어깨 앞쪽과 가슴이 펴지는 느낌으로 20초 유지한다."
+        ],
+        caution: "허리를 과하게 젖히지 않도록 주의하세요."
+      }
+    ]
+  },
+  back: {
+    label: "허리/등", emoji: "🧍",
+    desc: "장시간 앉아 있어 뻣뻣해진 허리와 등 근육을 이완시켜줍니다.",
+    stretches: [
+      {
+        name: "고양이-소 자세",
+        badge: "10회 반복",
+        seconds: 5,
+        steps: [
+          "바닥에 손과 무릎을 대고 네발기기 자세를 취한다.",
+          "숨을 들이마시며 배를 아래로 내리고 고개를 들어 허리를 젖힌다 (소 자세).",
+          "숨을 내쉬며 등을 둥글게 말아 올리고 고개를 숙인다 (고양이 자세).",
+          "천천히 10회 반복한다."
+        ],
+        caution: "허리 통증이 심할 경우 무리하게 젖히지 마세요."
+      },
+      {
+        name: "무릎 가슴 당기기",
+        badge: "좌우 각 20초",
+        seconds: 20,
+        steps: [
+          "바닥에 등을 대고 눕는다.",
+          "한쪽 무릎을 굽혀 양손으로 감싸 가슴 쪽으로 당긴다.",
+          "허리가 바닥에 눌리는 느낌으로 20초 유지 후 반대쪽도 실시한다."
+        ],
+        caution: "목과 어깨에 힘이 들어가지 않도록 편안하게 눕습니다."
+      },
+      {
+        name: "누워서 허리 비틀기",
+        badge: "좌우 각 20초",
+        seconds: 20,
+        steps: [
+          "등을 대고 누운 상태에서 양 무릎을 세운다.",
+          "양팔은 옆으로 벌려 바닥에 붙인다.",
+          "무릎을 모은 채 한쪽으로 천천히 넘겨 20초 유지한다.",
+          "반대쪽도 동일하게 실시한다."
+        ],
+        caution: "어깨가 바닥에서 뜨지 않는 범위까지만 넘기세요."
+      }
+    ]
+  },
+  wrist: {
+    label: "손목/팔", emoji: "🖐️",
+    desc: "컴퓨터 작업 등으로 인한 손목·전완 근육의 긴장을 풀어줍니다.",
+    stretches: [
+      {
+        name: "손목 앞으로 당기기",
+        badge: "좌우 각 15초",
+        seconds: 15,
+        steps: [
+          "한쪽 팔을 앞으로 뻗고 손바닥이 위를 향하게 한다.",
+          "반대 손으로 손가락을 잡아 아래쪽(손등 방향)으로 당긴다.",
+          "손목 안쪽이 늘어나는 느낌으로 15초 유지 후 반대쪽도 실시한다."
+        ],
+        caution: "손목에 통증이 있다면 강도를 낮추세요."
+      },
+      {
+        name: "손목 뒤로 당기기",
+        badge: "좌우 각 15초",
+        seconds: 15,
+        steps: [
+          "팔을 앞으로 뻗고 손등이 위를 향하게 한다.",
+          "반대 손으로 손등을 눌러 손목을 아래로 굽힌다.",
+          "손목 바깥쪽이 늘어나는 느낌으로 15초 유지 후 반대쪽도 실시한다."
+        ],
+        caution: "손가락 관절이 아닌 손목 중심으로 당기세요."
+      },
+      {
+        name: "손가락 스트레칭",
+        badge: "10초 × 3회",
+        seconds: 10,
+        steps: [
+          "한 손을 펴서 손가락을 반대 손으로 가볍게 뒤로 젖힌다.",
+          "10초간 유지 후 반대쪽 손도 실시한다.",
+          "각 손 3회씩 반복한다."
+        ],
+        caution: "과도하게 힘을 주지 말고 부드럽게 당기세요."
+      }
+    ]
+  },
+  hip: {
+    label: "골반/엉덩이", emoji: "🦴",
+    desc: "좌식 생활로 굳기 쉬운 골반 주변 근육(둔근, 이상근)을 이완시켜줍니다.",
+    stretches: [
+      {
+        name: "비둘기 자세",
+        badge: "좌우 각 30초",
+        seconds: 30,
+        steps: [
+          "네발기기 자세에서 한쪽 무릎을 앞으로 당겨 바깥쪽으로 눕힌다.",
+          "반대쪽 다리는 뒤로 곧게 뻗는다.",
+          "상체를 앞으로 천천히 숙여 엉덩이 근육이 늘어나는 것을 느끼며 30초 유지한다.",
+          "반대쪽도 동일하게 실시한다."
+        ],
+        caution: "무릎 통증이 있다면 각도를 완만하게 조절하세요."
+      },
+      {
+        name: "누워서 다리 4자 스트레칭",
+        badge: "좌우 각 20초",
+        seconds: 20,
+        steps: [
+          "바닥에 등을 대고 누워 양 무릎을 세운다.",
+          "한쪽 발목을 반대쪽 무릎 위에 올려 4자 모양을 만든다.",
+          "아래쪽 다리의 허벅지 뒤를 잡고 가슴 쪽으로 당긴다.",
+          "엉덩이 옆쪽이 늘어나는 느낌으로 20초 유지 후 반대쪽도 실시한다."
+        ],
+        caution: "허리가 과하게 들리지 않도록 천천히 당기세요."
+      }
+    ]
+  },
+  thigh: {
+    label: "허벅지", emoji: "🦵",
+    desc: "허벅지 앞/뒤 근육(대퇴사두근, 햄스트링)의 긴장을 풀어줍니다.",
+    stretches: [
+      {
+        name: "서서 허벅지 앞쪽 스트레칭",
+        badge: "좌우 각 20초",
+        seconds: 20,
+        steps: [
+          "한 손으로 벽이나 의자를 잡고 균형을 잡는다.",
+          "반대쪽 발을 뒤로 굽혀 손으로 발등을 잡는다.",
+          "발을 엉덩이 쪽으로 당기며 허벅지 앞쪽이 늘어나는 느낌을 20초 유지한다.",
+          "반대쪽도 동일하게 실시한다."
+        ],
+        caution: "무릎이 앞으로 튀어나오지 않게 골반을 살짝 앞으로 밀어주세요."
+      },
+      {
+        name: "햄스트링 스트레칭",
+        badge: "좌우 각 20초",
+        seconds: 20,
+        steps: [
+          "바닥에 앉아 한쪽 다리는 곧게 펴고 반대쪽 무릎은 굽혀 발바닥을 허벅지에 붙인다.",
+          "편 다리 쪽으로 상체를 천천히 숙인다.",
+          "허벅지 뒤쪽이 당기는 느낌으로 20초 유지 후 반대쪽도 실시한다."
+        ],
+        caution: "허리를 둥글게 말지 말고 엉덩이부터 숙이듯 상체를 기울이세요."
+      }
+    ]
+  },
+  calf: {
+    label: "종아리", emoji: "🦶",
+    desc: "오래 걷거나 서있을 때 뭉치기 쉬운 종아리 근육을 풀어줍니다.",
+    stretches: [
+      {
+        name: "벽 짚고 종아리 스트레칭",
+        badge: "좌우 각 20초",
+        seconds: 20,
+        steps: [
+          "벽에서 한 걸음 떨어져 양손으로 벽을 짚는다.",
+          "한쪽 다리를 뒤로 곧게 뻗고 발뒤꿈치를 바닥에 붙인다.",
+          "앞다리 무릎을 굽히며 뒷다리 종아리가 늘어나는 느낌으로 20초 유지한다.",
+          "반대쪽도 동일하게 실시한다."
+        ],
+        caution: "뒷다리 발끝이 정면을 향하도록 유지하세요."
+      },
+      {
+        name: "계단 이용 종아리 스트레칭",
+        badge: "20초 × 2회",
+        seconds: 20,
+        steps: [
+          "계단 끝에 발 앞쪽 절반만 걸친다.",
+          "손잡이를 잡고 뒤꿈치를 천천히 아래로 내린다.",
+          "종아리가 당기는 느낌으로 20초 유지 후 천천히 올라온다."
+        ],
+        caution: "균형을 잃지 않도록 반드시 손잡이나 벽을 잡고 실시하세요."
+      }
+    ]
+  },
+  ankle: {
+    label: "발목", emoji: "🩰",
+    desc: "발목의 유연성을 높이고 부상을 예방하는 데 도움이 됩니다.",
+    stretches: [
+      {
+        name: "발목 돌리기",
+        badge: "좌우 각 10회",
+        seconds: 15,
+        steps: [
+          "의자에 앉아 한쪽 발을 살짝 든다.",
+          "발목을 시계 방향으로 천천히 10회 돌린다.",
+          "반시계 방향으로도 10회 돌린 뒤 반대쪽 발도 실시한다."
+        ],
+        caution: "통증이 없는 범위 내에서 천천히 돌리세요."
+      },
+      {
+        name: "앉아서 발목 당기기",
+        badge: "좌우 각 15초",
+        seconds: 15,
+        steps: [
+          "바닥에 앉아 다리를 곧게 편다.",
+          "발끝을 몸 쪽으로 당겨 종아리와 발목 뒤쪽이 늘어나는 느낌을 15초 유지한다.",
+          "발끝을 반대로 밀어 발등 쪽도 15초 스트레칭한다.",
+          "반대쪽 발도 동일하게 실시한다."
+        ],
+        caution: "무릎을 굽히지 않고 곧게 편 상태를 유지하세요."
+      }
+    ]
+  }
+};
+
+const grid = document.getElementById('part-grid');
+const resultSection = document.getElementById('result-section');
+const emptyHint = document.getElementById('empty-hint');
+const resultEmoji = document.getElementById('result-emoji');
+const resultName = document.getElementById('result-name');
+const resultDesc = document.getElementById('result-desc');
+const stretchList = document.getElementById('stretch-list');
+
+Object.entries(DATA).forEach(([key, part]) => {
+  const btn = document.createElement('button');
+  btn.className = 'part-btn';
+  btn.dataset.key = key;
+  btn.innerHTML = `<span class="emoji">${part.emoji}</span><span>${part.label}</span>`;
+  btn.addEventListener('click', () => selectPart(key));
+  grid.appendChild(btn);
+});
+
+function selectPart(key) {
+  document.querySelectorAll('.part-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.key === key);
+  });
+
+  const part = DATA[key];
+  resultEmoji.textContent = part.emoji;
+  resultName.textContent = `${part.label} 스트레칭`;
+  resultDesc.textContent = part.desc;
+
+  stretchList.innerHTML = '';
+  part.stretches.forEach((s, idx) => {
+    const card = document.createElement('div');
+    card.className = 'stretch-card';
+
+    const stepsHtml = s.steps.map(st => `<li>${st}</li>`).join('');
+
+    card.innerHTML = `
+      <div class="stretch-head">
+        <h3>${idx + 1}. ${s.name}</h3>
+        <span class="badge">${s.badge}</span>
+      </div>
+      <ol class="steps">${stepsHtml}</ol>
+      <div class="caution">⚠️ ${s.caution}</div>
+      <div class="timer-row">
+        <button class="timer-btn" data-seconds="${s.seconds}">${s.seconds}초 타이머 시작</button>
+        <span class="timer-display"></span>
+      </div>
+    `;
+
+    const timerBtn = card.querySelector('.timer-btn');
+    const timerDisplay = card.querySelector('.timer-display');
+    timerBtn.addEventListener('click', () => runTimer(timerBtn, timerDisplay, s.seconds));
+
+    stretchList.appendChild(card);
+  });
+
+  resultSection.classList.add('visible');
+  emptyHint.style.display = 'none';
+}
+
+function runTimer(btn, display, totalSeconds) {
+  let remaining = totalSeconds;
+  btn.disabled = true;
+  const originalText = `${totalSeconds}초 타이머 시작`;
+  display.textContent = `남은 시간: ${remaining}초`;
+
+  const interval = setInterval(() => {
+    remaining -= 1;
+    if (remaining <= 0) {
+      clearInterval(interval);
+      display.textContent = '완료! 👍';
+      btn.disabled = false;
+      btn.textContent = originalText;
+      setTimeout(() => { display.textContent = ''; }, 2500);
+    } else {
+      display.textContent = `남은 시간: ${remaining}초`;
+    }
+  }, 1000);
+}
+</script>
+</body>
 </html>
