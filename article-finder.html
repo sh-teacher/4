@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주제별 기사·논문 검색기</title>
+<style>
+  :root {
+    --bg: #f3f5f8;
+    --card-bg: #ffffff;
+    --text: #1b2130;
+    --text-dim: #5d6673;
+    --accent: #2f5fb5;
+    --accent-soft: #e6edf9;
+    --border: #e2e6ec;
+    --danger: #b5502f;
+    --danger-soft: #fbeee6;
+    --tab-bg: #e9edf3;
+    --shadow: 0 1px 3px rgba(20, 30, 40, 0.08), 0 1px 2px rgba(20, 30, 40, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161d;
+      --card-bg: #1c222b;
+      --text: #eef1f4;
+      --text-dim: #97a2af;
+      --accent: #6f9bef;
+      --accent-soft: #202b3d;
+      --border: #2a3138;
+      --danger: #e08a63;
+      --danger-soft: #33221b;
+      --tab-bg: #1a2029;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    padding: 26px 20px 6px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0 0 6px;
+    font-size: 1.45rem;
+  }
+  header p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 18px 16px 60px;
+  }
+  .search-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .search-row input {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text);
+    font-size: 0.98rem;
+  }
+  .search-row input:focus { outline: 2px solid var(--accent); }
+  .search-row button {
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+  .search-row button:disabled { opacity: 0.6; cursor: default; }
+  .hint {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    margin: 0 0 20px;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--tab-bg);
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 9px 6px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  .tab-btn.active {
+    background: var(--card-bg);
+    color: var(--accent);
+    box-shadow: var(--shadow);
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .status-msg {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    padding: 30px 10px;
+    text-align: center;
+  }
+  .status-msg.error { color: var(--danger); }
+  .retry-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.82rem;
+  }
+  .result-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .result-card a.title-link {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  .result-card a.title-link:hover { color: var(--accent); }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 6px 0 8px;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+  .meta-badge {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .snippet {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    margin: 0;
+  }
+  .spinner {
+    width: 26px; height: 26px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.76rem;
+    padding: 10px 20px 30px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔎 주제별 기사·논문 검색기</h1>
+  <p>궁금한 주제를 입력하면 국내기사·해외기사·논문을 나눠서 찾아드려요</p>
+</header>
+
+<main>
+  <div class="search-row">
+    <input type="text" id="query-input" placeholder="예: 인공지능, 기후변화, artificial intelligence ...">
+    <button id="search-btn">검색</button>
+  </div>
+  <p class="hint">💡 해외기사·논문은 영어 키워드로 검색할수록 더 많은 결과가 나와요. (검색 범위: 최근 40년, 1986~현재)</p>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="domestic">🇰🇷 국내기사</button>
+    <button class="tab-btn" data-tab="world">🌍 해외기사</button>
+    <button class="tab-btn" data-tab="papers">📄 논문</button>
+  </div>
+
+  <div class="panel active" id="panel-domestic">
+    <div class="status-msg" id="status-domestic">주제를 입력하고 검색해보세요</div>
+    <div id="list-domestic"></div>
+  </div>
+  <div class="panel" id="panel-world">
+    <div class="status-msg" id="status-world">주제를 입력하고 검색해보세요</div>
+    <div id="list-world"></div>
+  </div>
+  <div class="panel" id="panel-papers">
+    <div class="status-msg" id="status-papers">주제를 입력하고 검색해보세요</div>
+    <div id="list-papers"></div>
+  </div>
+</main>
+
+<footer>
+  국내·해외 기사는 Google News, 논문은 Semantic Scholar 공개 데이터를 사용합니다.<br>
+  외부 프록시를 경유하므로 간헐적으로 응답이 늦어지거나 실패할 수 있어요. 실패 시 다시 시도 버튼을 눌러주세요.
+</footer>
+
+<script>
+const queryInput = document.getElementById('query-input');
+const searchBtn = document.getElementById('search-btn');
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+searchBtn.addEventListener('click', runSearch);
+queryInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
+
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function setStatus(key, html, isError) {
+  const el = document.getElementById('status-' + key);
+  el.style.display = 'block';
+  el.className = 'status-msg' + (isError ? ' error' : '');
+  el.innerHTML = html;
+}
+function hideStatus(key) {
+  document.getElementById('status-' + key).style.display = 'none';
+}
+function clearList(key) {
+  document.getElementById('list-' + key).innerHTML = '';
+}
+
+async function fetchWithTimeout(url, ms) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Reader proxy: reliably bypasses CORS for cross-origin XML/HTML pages, returns extracted content as markdown.
+async function fetchViaJinaReader(targetUrl) {
+  const res = await fetchWithTimeout(`https://r.jina.ai/${targetUrl}`, 12000);
+  if (!res.ok) throw new Error('리더 프록시 HTTP ' + res.status);
+  const text = await res.text();
+  const marker = 'Markdown Content:';
+  const idx = text.indexOf(marker);
+  const body = idx > -1 ? text.slice(idx + marker.length).trim() : text.trim();
+  if (!body) throw new Error('리더 프록시 빈 응답');
+  return body;
+}
+
+// Fallback proxy: wraps the raw response body in JSON as `contents`.
+async function fetchViaAllOrigins(targetUrl) {
+  const res = await fetchWithTimeout(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, 15000);
+  if (!res.ok) throw new Error('대체 프록시 HTTP ' + res.status);
+  const data = await res.json();
+  if (!data.contents) throw new Error('대체 프록시 빈 응답');
+  return data.contents;
+}
+
+function parseMarkdownNewsItems(markdown) {
+  const headingRe = /### \[(.+?)\]\((https:\/\/news\.google\.com\/rss\/articles\/[^)\s]+)\)/g;
+  const dateRe = /\b[A-Za-z]{3}, \d{1,2} [A-Za-z]{3} \d{4} \d{2}:\d{2}:\d{2} GMT\b/g;
+  const headings = [...markdown.matchAll(headingRe)];
+  const dates = [...markdown.matchAll(dateRe)];
+  return headings.map((h, i) => {
+    const fullTitle = h[1];
+    const link = h[2];
+    const sepIdx = fullTitle.lastIndexOf(' - ');
+    const title = sepIdx > -1 ? fullTitle.slice(0, sepIdx) : fullTitle;
+    const source = sepIdx > -1 ? fullTitle.slice(sepIdx + 3) : '';
+    const pubDate = dates[i] ? dates[i][0] : '';
+    return { title, link, source, pubDate };
+  });
+}
+
+function parseGoogleNewsRss(xmlText) {
+  const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+  if (doc.querySelector('parsererror')) throw new Error('RSS 파싱 오류');
+  return Array.from(doc.querySelectorAll('item')).map(item => {
+    const title = item.querySelector('title')?.textContent || '(제목 없음)';
+    const link = item.querySelector('link')?.textContent || '#';
+    const pubDate = item.querySelector('pubDate')?.textContent || '';
+    const source = item.querySelector('source')?.textContent || '';
+    return { title, link, pubDate, source };
+  });
+}
+
+function formatDate(pubDate) {
+  if (!pubDate) return '';
+  const d = new Date(pubDate);
+  if (isNaN(d)) return pubDate;
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function renderNewsList(key, items) {
+  const container = document.getElementById('list-' + key);
+  if (!items.length) {
+    setStatus(key, '검색 결과가 없어요. 다른 키워드로 시도해보세요.');
+    return;
+  }
+  hideStatus(key);
+  container.innerHTML = items.slice(0, 15).map(a => `
+    <div class="result-card">
+      <a class="title-link" href="${escapeHtml(a.link)}" target="_blank" rel="noopener">${escapeHtml(a.title)}</a>
+      <div class="meta-row">
+        ${a.source ? `<span class="meta-badge">${escapeHtml(a.source)}</span>` : ''}
+        ${a.pubDate ? `<span>${escapeHtml(formatDate(a.pubDate))}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderPapersList(items) {
+  const container = document.getElementById('list-papers');
+  if (!items.length) {
+    setStatus('papers', '검색 결과가 없어요. 영어 키워드로 다시 시도해보세요.');
+    return;
+  }
+  hideStatus('papers');
+  container.innerHTML = items.map(p => {
+    const link = p.openAccessPdf?.url || p.url || (p.externalIds?.DOI ? `https://doi.org/${p.externalIds.DOI}` : '#');
+    const authors = (p.authors || []).slice(0, 4).map(a => a.name).join(', ') + ((p.authors || []).length > 4 ? ' 외' : '');
+    return `
+      <div class="result-card">
+        <a class="title-link" href="${escapeHtml(link)}" target="_blank" rel="noopener">${escapeHtml(p.title)}</a>
+        <div class="meta-row">
+          ${p.year ? `<span class="meta-badge">${p.year}</span>` : ''}
+          ${p.venue ? `<span>${escapeHtml(p.venue)}</span>` : ''}
+          ${authors ? `<span>${escapeHtml(authors)}</span>` : ''}
+        </div>
+        ${p.abstract ? `<p class="snippet">${escapeHtml(p.abstract.slice(0, 220))}${p.abstract.length > 220 ? '…' : ''}</p>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadNews(key, rssUrl) {
+  clearList(key);
+  setStatus(key, `<div class="spinner"></div>${key === 'domestic' ? '국내기사' : '해외기사'}를 찾는 중...`);
+  try {
+    const markdown = await fetchViaJinaReader(rssUrl);
+    const items = parseMarkdownNewsItems(markdown);
+    if (!items.length) throw new Error('결과 없음');
+    renderNewsList(key, items);
+  } catch (e1) {
+    try {
+      const xml = await fetchViaAllOrigins(rssUrl);
+      renderNewsList(key, parseGoogleNewsRss(xml));
+    } catch (e2) {
+      const fnName = key === 'domestic' ? 'loadDomesticNews' : 'loadWorldNews';
+      setStatus(key, `불러오지 못했어요. (${escapeHtml(e2.message)})<br><button class="retry-btn" onclick="${fnName}(document.getElementById('query-input').value.trim())">다시 시도</button>`, true);
+    }
+  }
+}
+
+const YEAR_RANGE_START = 1986; // 최근 40년으로 검색 범위를 제한해 기사량을 줄이고 로딩 속도를 개선
+const YEAR_RANGE_END = 2026;
+
+function loadDomesticNews(query) {
+  const scopedQuery = `${query} after:${YEAR_RANGE_START}-01-01`;
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(scopedQuery)}&hl=ko&gl=KR&ceid=KR:ko`;
+  return loadNews('domestic', rssUrl);
+}
+
+function loadWorldNews(query) {
+  const scopedQuery = `${query} after:${YEAR_RANGE_START}-01-01`;
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(scopedQuery)}&hl=en-US&gl=US&ceid=US:en`;
+  return loadNews('world', rssUrl);
+}
+
+async function loadPapers(query) {
+  clearList('papers');
+  setStatus('papers', '<div class="spinner"></div>논문을 찾는 중...');
+  const apiUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&year=${YEAR_RANGE_START}-${YEAR_RANGE_END}&limit=10&fields=title,abstract,year,venue,authors,url,externalIds,openAccessPdf`;
+  const checkRateLimit = data => {
+    if (data && data.code === '429') throw new Error('요청이 많아 잠시 제한되었어요. 잠시 후 다시 시도해주세요.');
+  };
+  try {
+    const res = await fetchWithTimeout(apiUrl, 12000);
+    const data = await res.json();
+    checkRateLimit(data);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    renderPapersList(data.data || []);
+  } catch (e1) {
+    try {
+      const raw = await fetchViaAllOrigins(apiUrl);
+      const data = JSON.parse(raw);
+      checkRateLimit(data);
+      renderPapersList(data.data || []);
+    } catch (e2) {
+      setStatus('papers', `불러오지 못했어요. (${escapeHtml(e2.message)})<br><button class="retry-btn" onclick="loadPapers(document.getElementById('query-input').value.trim())">다시 시도</button>`, true);
+    }
+  }
+}
+
+function runSearch() {
+  const query = queryInput.value.trim();
+  if (!query) {
+    queryInput.focus();
+    return;
+  }
+  loadDomesticNews(query);
+  loadWorldNews(query);
+  loadPapers(query);
+}
+</script>
+</body>
+</html>
