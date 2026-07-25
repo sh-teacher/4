@@ -200,7 +200,7 @@
     <input type="text" id="query-input" placeholder="예: 인공지능, 기후변화, artificial intelligence ...">
     <button id="search-btn">검색</button>
   </div>
-  <p class="hint">💡 해외기사·논문은 영어 키워드로 검색할수록 더 많은 결과가 나와요. (검색 범위: 최근 40년, 1986~현재)</p>
+  <p class="hint">💡 해외기사·논문은 영어 키워드로 검색할수록 더 많은 결과가 나와요. (기간 제한 없이 전체 검색)</p>
 
   <div class="tabs">
     <button class="tab-btn active" data-tab="domestic">🇰🇷 국내기사</button>
@@ -392,25 +392,20 @@ async function loadNews(key, rssUrl) {
   }
 }
 
-const YEAR_RANGE_START = 1986; // 최근 40년으로 검색 범위를 제한해 기사량을 줄이고 로딩 속도를 개선
-const YEAR_RANGE_END = 2026;
-
 function loadDomesticNews(query) {
-  const scopedQuery = `${query} after:${YEAR_RANGE_START}-01-01`;
-  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(scopedQuery)}&hl=ko&gl=KR&ceid=KR:ko`;
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko`;
   return loadNews('domestic', rssUrl);
 }
 
 function loadWorldNews(query) {
-  const scopedQuery = `${query} after:${YEAR_RANGE_START}-01-01`;
-  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(scopedQuery)}&hl=en-US&gl=US&ceid=US:en`;
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
   return loadNews('world', rssUrl);
 }
 
 async function loadPapers(query) {
   clearList('papers');
   setStatus('papers', '<div class="spinner"></div>논문을 찾는 중...');
-  const apiUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&year=${YEAR_RANGE_START}-${YEAR_RANGE_END}&limit=10&fields=title,abstract,year,venue,authors,url,externalIds,openAccessPdf`;
+  const apiUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&limit=10&fields=title,abstract,year,venue,authors,url,externalIds,openAccessPdf`;
   const checkRateLimit = data => {
     if (data && data.code === '429') throw new Error('요청이 많아 잠시 제한되었어요. 잠시 후 다시 시도해주세요.');
   };
